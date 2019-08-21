@@ -1,3 +1,14 @@
+# My changes
+
+* Added Salt states for provisioning Jenkins! Run the project using  `vagrant up jenkins`
+* Stubs exist for Sonarqube and Artifactory servers
+
+TODO:
+1. Actually implement a pipeline
+2. Finish the external services integration
+3. Some serveo weirdness as there are no rewrites on the reverse proxy
+
+
 # Spring PetClinic Sample Application
 
 
