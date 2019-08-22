@@ -147,5 +147,21 @@ pipeline {
         echo "Should be accessible at https://dev.petclinic.liatr.io/petclinic"
       }
     }
+
+    stage('Deploy to Staging') {
+      when {
+        branch 'master'
+      }
+      agent {
+        docker {
+          image 'maven:3.5.0'
+          args '-e JOB_NAME --network=${LDOP_NETWORK_NAME}'
+        }
+      }
+      steps {
+        sh "echo deploying ${JOB_NAME} to staging..."
+        echo "Deployed!"
+      }
+    }
   }
 }
