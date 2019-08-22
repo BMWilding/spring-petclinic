@@ -1,12 +1,18 @@
-# My changes
+# My changes to the project
 
-* Added Salt states for provisioning Jenkins! Run the project using  `vagrant up jenkins`
-* Stubs exist for Sonarqube and Artifactory servers
+Pipeline should work out of the box. There's an issue with Salt-Docker where it
+doesn't get the new context after pip installs docker, so to get it working you need to
+do a `vagrant up; vagrant provision;`
 
-TODO:
-1. Actually implement a pipeline
-2. Finish the external services integration
-3. Some serveo weirdness as there are no rewrites on the reverse proxy
+Once up here are the ports forwarded:
+* Jenkins   => localhost:16016
+* Nexus     => localhost:16017
+* Sonarqube => localhost:16018
+
+All credentials are the defaults for the application:
+* Jenkins   => none
+* Nexus     => admin, admin123
+* Sonarqube => admin, admin
 
 
 # Spring PetClinic Sample Application

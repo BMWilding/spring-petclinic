@@ -13,7 +13,7 @@ pipeline {
     SONAR_ACCOUNT_LOGIN = 'admin'
     SONAR_ACCOUNT_PASSWORD = 'admin'
 
-    # No need to deploy a fake app to DockerHub
+    // No need to deploy a fake app to DockerHub
     IS_REAL = false
   }
 
