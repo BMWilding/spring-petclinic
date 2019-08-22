@@ -50,7 +50,7 @@ Vagrant.configure("2") do |config|
                 'scm' => {
                   'type' => 'git',
                   'url' => 'https://github.com/BMWilding/spring-petclinic.git',
-                  'branch' => 'hotfix/pipeline-issues',
+                  'branch' => 'master',
                   'script' => 'Jenkinsfile',
                   'github' => {
                     'url' => 'https://github.com/BMWilding/spring-petclinic',
