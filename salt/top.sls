@@ -1,8 +1,7 @@
 base:
   'jenkins':
+    - docker
     - jenkins
     - serveo
-  'sonarqube':
+    - nexus
     - sonarqube
-  'artifactory':
-    - artifactory

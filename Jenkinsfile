@@ -6,8 +6,15 @@ pipeline {
   agent none
 
   environment {
-    IMAGE = 'liatrio/petclinic-tomcat'
-    TAG = '1.0.0'
+    IMAGE = "liatrio/petclinic-tomcat"
+    LDOP_NETWORK_NAME = "liatrionet"
+    INITIAL_ADMIN_USER = 'admin'
+    INITIAL_ADMIN_PASSWORD = 'admin123'    
+    SONAR_ACCOUNT_LOGIN = 'admin'
+    SONAR_ACCOUNT_PASSWORD = 'admin'
+
+    # No need to deploy a fake app to DockerHub
+    IS_REAL = false
   }
 
   stages {
@@ -16,28 +23,24 @@ pipeline {
       agent {
         docker {
           image 'maven:3.5.0'
-          args '-e admin -e password'
+          args '-e INITIAL_ADMIN_USER -e INITIAL_ADMIN_PASSWORD --network=${LDOP_NETWORK_NAME}'
         }
       }
-      environment {
-        SERVER = 'http://liatrioaartifactory:9000/artifactory/liatriomaven'
-      }
       steps {
-        sh "mvn"
+        configFileProvider([configFile(fileId: 'nexus', variable: 'MAVEN_SETTINGS')]) {
+          sh 'mvn -s $MAVEN_SETTINGS clean deploy -DskipTests=true -B'
+        }
       }
     }
     stage('Sonar') {
       agent  {
         docker {
-          image 'centos:7'
+          image 'ciricihq/gitlab-sonar-scanner'
+          args '-e SONAR_ACCOUNT_LOGIN -e SONAR_ACCOUNT_PASSWORD --network=${LDOP_NETWORK_NAME}'
         }
       }
-      environment {
-        SONAR_ACCOUNT_LOGIN = 'admin'
-        SONAR_ACCOUNT_PASSWORD = 'admin'
-      }
       steps {
-        sh "echo Running sonar"
+        sh 'sonar-scanner -X -D sonar.login=${SONAR_ACCOUNT_LOGIN} -D sonar.password=${SONAR_ACCOUNT_PASSWORD} -Dsonar.projectBaseDir=${PWD}'
       }
     }
 
@@ -45,61 +48,103 @@ pipeline {
       agent {
         docker {
           image 'maven:3.5.0'
-          args '-e admin -e password'
+          args '-e INITIAL_ADMIN_USER -e INITIAL_ADMIN_PASSWORD --network=${LDOP_NETWORK_NAME}'
         }
       }
       steps {
         sh 'mvn clean'
+        script {
+          pom = readMavenPom file: 'pom.xml'
+          getArtifact(pom.groupId, pom.artifactId, pom.version, 'petclinic')
+        }
       }
     }
 
     stage('Build container') {
       agent any
       steps {
-          sh "echo docker build -t ${IMAGE}:${TAG} ."
+        script {
+          if ( env.BRANCH_NAME == 'master' ) {
+            pom = readMavenPom file: 'pom.xml'
+            TAG = pom.version
+          } else {
+            TAG = env.BRANCH_NAME
+          }
+          sh "docker build -t ${env.IMAGE}:${TAG} ."
+        }
       }
     }
 
     stage('Run local container') {
       agent any
       steps {
-        sh "echo docker run -d --name petclinic-tomcat-temp ${IMAGE}:${TAG}"
+        sh 'docker rm -f petclinic-tomcat-temp || true'
+        sh "docker run -d --network=${LDOP_NETWORK_NAME} --name petclinic-tomcat-temp ${env.IMAGE}:${TAG}"
       }
     }
 
     stage('Smoke-Test & OWASP Security Scan') {
+      when {
+        expression { IS_REAL == true }
+      }
       agent {
         docker {
           image 'maven:3.5.0'
+          args '--network=${LDOP_NETWORK_NAME}'
         }
       }
       steps {
-        sh "echo cd regression-suite && mvn clean -B test -DPETCLINIC_URL=http://petclinic-tomcat-temp:8080/petclinic/"
-        sh "echo The tests run, but fail..."
+        sh "cd regression-suite && mvn clean -B test -DPETCLINIC_URL=http://petclinic-tomcat-temp:8080/petclinic/"
       }
     }
-
     stage('Stop local container') {
       agent any
       steps {
-        sh 'echo docker rm -f petclinic-tomcat-temp || true'
+        sh 'docker rm -f petclinic-tomcat-temp || true'
       }
     }
 
+
+    stage('Push to dockerhub') {
+      when {
+        expression { IS_REAL == true }
+      }
+      agent any
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'dockerPassword', usernameVariable: 'dockerUsername')]){
+          script {
+            sh "docker login -u ${env.dockerUsername} -p ${env.dockerPassword}"
+            sh "docker push ${env.IMAGE}:${TAG}"
+          }
+        }
+      }
+    }
+    
     stage('Deploy to dev') {
       when {
         branch 'master'
       }
       agent any
       steps {
-        sh "echo docker run -d petclinic-tomcat-temp ${IMAGE}:${TAG}"
+        script {
+          deployToEnvironment("ec2-user", "dev.petclinic.liatr.io", "petclinic-deploy-key", env.IMAGE, TAG, "spring-petclinic", "dev.petclinic.liatr.io")
+        }
       }
     }
     
-    stage('Smoke test Dev') {
-      agent any
+    stage('Smoke test dev') {
+      when {
+        branch 'master'
+      }
+      agent {
+        docker {
+          image 'maven:3.5.0'
+          args '--network=${LDOP_NETWORK_NAME}'
+        }
+      }
       steps {
-        sh 'echo Smoked like salmon'
+        sh "cd regression-suite && mvn clean -B test -DPETCLINIC_URL=https://dev.petclinic.liatr.io/petclinic"
+        echo "Should be accessible at https://dev.petclinic.liatr.io/petclinic"
       }
     }
   }

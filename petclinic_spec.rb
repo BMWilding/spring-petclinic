@@ -2,7 +2,7 @@ require 'headless'
 require 'selenium-webdriver'
 require 'minitest/autorun'
 
-describe 'Petlinic' do
+describe 'Petclinic' do
   before do
     @headless = Headless.new
     @headless.start

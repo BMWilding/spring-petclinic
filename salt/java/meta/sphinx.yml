@@ -1,9 +1,0 @@
-doc:
-  name: Java
-  description: Programming language environment.
-  role:
-  {%- if pillar.java.environment is defined %}
-    environment:
-      name: environment
-      param: {}
-  {%- endif %}
