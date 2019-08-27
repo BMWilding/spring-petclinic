@@ -5,3 +5,5 @@ base:
     - serveo
     - nexus
     - sonarqube
+  'jenkins-worker':
+    - jenkins
