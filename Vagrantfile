@@ -24,7 +24,7 @@ Vagrant.configure("2") do |config|
       salt.minion_config = 'salt/minion.yml'
       salt.pillar({
         'jenkins' => {
-          'url' => "http://#{jenkins.vm.hostname}:8080",
+          'url' => "http://localhost:8080",
           'user' => '',
           'password' => '',
           'client' => {
