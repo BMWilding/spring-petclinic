@@ -4,8 +4,11 @@ Vagrant.configure("2") do |config|
     jenkins.vm.box = 'liatrio-engineering/jenkins-nexus'
     jenkins.vm.hostname = 'liatrio-jenkins'
     jenkins.vm.network :private_network, type: 'dhcp'
+# Jenkins
     jenkins.vm.network :forwarded_port, guest: 8080, host: 16016
+# Nexus
     jenkins.vm.network :forwarded_port, guest: 8081, host: 16017
+# Sonarqube
     jenkins.vm.network :forwarded_port, guest: 9000, host: 16018
 
     jenkins.vm.provider :virtualbox do |vbox|
