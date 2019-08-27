@@ -1,3 +1,5 @@
+import logging
+
 def __virtual__():
     '''
     Only load if jenkins_common module exist.
@@ -50,6 +52,8 @@ def present(name, remote_home, launcher, num_executors="1",
         'salt://jenkins/files/groovy/node.template',
         __env__)
 
+    log = logging.getLogger(__name__)
+
     label_string = " ".join(labels)
     launcher_string = "new hudson.slaves.JNLPLauncher()"
     tunnel_string = ""
@@ -57,6 +61,7 @@ def present(name, remote_home, launcher, num_executors="1",
     if "jvmopts" in launcher:
         jvmopts_string = launcher["jvmopts"]
     if launcher:
+        log.warning(launcher)
         if launcher["type"] == "ssh":
             launcher_string = 'new hudson.plugins.sshslaves.SSHLauncher("{}",{},"{}","{}","","{}","","","")'.format(
                 launcher["host"], launcher["port"], launcher["username"],

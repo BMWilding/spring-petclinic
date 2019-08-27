@@ -1,7 +1,7 @@
 include:
   - docker
 
-{% if pillar['nexus.remove_local'] %}
+{% if pillar['nexus']['remove_local'] is defined %}
 disable-local-nexus:
   service.dead:
     - name: nexus
@@ -21,18 +21,22 @@ remove-old-files:
     - clean: true
     - onlyif: 
       - test -d /var/lib/sonatype-work
+  
+  docker_image.absent:
+    - images:
+        - sonatype/nexus:2.11.0
+        - sonatype/nexus:2.10.0
+
 {% endif %}
 
 nexus-docker:
   docker_container.running:
     - name: nexus
-    - image: docker.io/sonatype/nexus
+    - image: docker.io/sonatype/nexus:oss
     - port_bindings:
       - 8081:8081
-{% if pillar['docker.network.name'] is defined %}
-{% set docker_network_name = pillar['docker.network.name'] %}
+{% if pillar['docker']['network']['name'] is defined %}
+{% set docker_network_name = pillar['docker']['network']['name'] %}
     - networks:
-      - {{ docker_network_name }}
-    - require:
       - {{ docker_network_name }}
 {% endif %}

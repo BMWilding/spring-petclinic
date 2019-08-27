@@ -12,9 +12,6 @@ include:
 {%- if pillar.jenkins.client is defined %}
 - jenkins.client
 {%- endif %}
-
-upgrade-jenkins:
-  pkg.latest:
-    - name: jenkins
-    - version: '2.176.2'
-    - refresh: true
+{%- if pillar.jenkins.upgrade is defined %}
+- jenkins.upgrade
+{%- endif %}

@@ -1,9 +1,11 @@
 base:
   'jenkins':
-    - docker
     - jenkins
     - serveo
+  'worker':
+    - packages
+    - docker
+    - docker.network
     - nexus
     - sonarqube
-  'jenkins-worker':
-    - jenkins
+    - jenkins.ssh.worker

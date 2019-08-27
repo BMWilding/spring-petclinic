@@ -13,7 +13,12 @@ node_{{ name }}:
     - name: {{ node.get('name', name) }}
     - desc:  {{ node.get('desc','') }}
     - remote_home: {{ node.remote_home }}
-    - launcher: {{ node.launcher }}
+    - launcher: 
+        type: {{ node.launcher.type }}
+        host: {{ node.launcher.host }}
+        port: {{ node.launcher.port }}
+        username: {{ node.launcher.username }}
+        password: {{ node.launcher.password }}
     - num_executors: {{ node.get('num_executors','1') }}
     - node_mode: {{ node.get('node_mode','Normal') }}
     - ret_strategy: {{ node.get('ret_strategy','Always') }}
