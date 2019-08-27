@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.springframework.samples</groupId>
     <artifactId>spring-petclinic</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.1</version>
 
     <name>petclinic</name>
     <packaging>war</packaging>
@@ -47,7 +47,7 @@
     </properties>
 
     <scm>
-        <developerConnection>scm:git:https://github.com/liatrio/spring-petclinic/</developerConnection>
+        <developerConnection>scm:git:https://github.com/BMWilding/spring-petclinic/</developerConnection>
         <tag>spring-petclinic-1.0.0</tag>
     </scm>
 

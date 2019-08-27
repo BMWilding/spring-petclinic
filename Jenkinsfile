@@ -14,7 +14,7 @@ pipeline {
     SONAR_ACCOUNT_PASSWORD = 'admin'
 
     // No need to deploy a fake app to DockerHub
-    IS_REAL = false
+    IS_REAL = true  
   }
 
   stages {
@@ -28,7 +28,7 @@ pipeline {
       }
       steps {
         configFileProvider([configFile(fileId: 'nexus', variable: 'MAVEN_SETTINGS')]) {
-          sh 'mvn -s $MAVEN_SETTINGS clean deploy -DskipTests=true -B'
+          sh 'mvn -s $MAVEN_SETTINGS clean deploy -DskipTests=false -B'
         }
       }
     }
@@ -111,12 +111,7 @@ pipeline {
       }
       agent any
       steps {
-        withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'dockerPassword', usernameVariable: 'dockerUsername')]){
-          script {
-            sh "docker login -u ${env.dockerUsername} -p ${env.dockerPassword}"
-            sh "docker push ${env.IMAGE}:${TAG}"
-          }
-        }
+        echo "Here's where I'd put my registry"
       }
     }
     
