@@ -20,9 +20,6 @@ Vagrant.configure("2") do |config|
       salt.minion_id = 'jenkins'
       salt.minion_config = 'salt/minion.yml'
       salt.pillar({
-        'packages' => [
-          'yum-plugin-versionlock'
-        ],
         'jenkins' => {
           'url' => "http://localhost:8080",
           'password' => '',
@@ -55,24 +52,6 @@ Vagrant.configure("2") do |config|
               'host' => 'localhost',
               'port' => '8080',
               'protocol' => 'http'
-            },
-            'node' => {
-              'worker' => {
-                'remote_home' => '/home/jenkinsworker',
-                'desc' => 'worker',
-                'num_executors' => 2,
-                'ret_strategy' => 'Always',
-                'labels' => [ 
-                  'docker'
-                ],
-                'launcher' => {
-                   'type' => 'ssh',
-                   'host' => '192.168.100.3',
-                   'port' => 22,
-                   'username' => 'jenkinsworker',
-                   'password' => 'hardlyworking'
-                }
-              }
             },
             'lib' => { 
               'ldop-shared-library' => {
@@ -108,6 +87,18 @@ Vagrant.configure("2") do |config|
         'serveo' => {
           'hostname' => 'liatriobryson'
         },
+        'packages' => [
+          'yum-plugin-versionlock'
+        ],
+        'docker' => {
+          'network' => {
+            'name' => 'host',
+            'type' => 'host'
+          }
+        },
+        'nexus' => {
+          'set_hostname' => true
+        }
       })
     end
 
@@ -134,19 +125,6 @@ Vagrant.configure("2") do |config|
       salt.python_version = '3'
       salt.minion_config = 'salt/minion.yml'
       salt.pillar({
-        'packages' => [
-          'yum-plugin-versionlock',
-          'java-11-openjdk'
-        ],
-        'docker' => {
-          'purge_abandoned' => true,
-          'network' => {
-            'name' => 'liatrionet'
-          }
-        },
-        'nexus' => {
-          'remove_local' => true
-        }
       })
     end
   end

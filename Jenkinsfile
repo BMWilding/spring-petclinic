@@ -7,7 +7,7 @@ pipeline {
 
   environment {
     IMAGE = "liatrio/petclinic-tomcat"
-    LDOP_NETWORK_NAME = "liatrionet"
+    LDOP_NETWORK_NAME = "bridge"
     INITIAL_ADMIN_USER = 'admin'
     INITIAL_ADMIN_PASSWORD = 'admin123'    
     SONAR_ACCOUNT_LOGIN = 'admin'
