@@ -1,6 +1,6 @@
 #!/bin/env groovy
 
-@Library('ldop-shared-library') _
+@Library('ldop-shared-library@fd16602cad0f97ca1b04090f93a0540ddc871b45') _
 
 pipeline {
   agent none
@@ -9,12 +9,12 @@ pipeline {
     IMAGE = "liatrio/petclinic-tomcat"
     LDOP_NETWORK_NAME = "liatrionet"
     INITIAL_ADMIN_USER = 'admin'
-    INITIAL_ADMIN_PASSWORD = 'admin123'    
+    INITIAL_ADMIN_PASSWORD = 'admin123'
     SONAR_ACCOUNT_LOGIN = 'admin'
     SONAR_ACCOUNT_PASSWORD = 'admin'
 
     // No need to deploy a fake app to DockerHub
-    IS_REAL = true  
+    IS_REAL = true
   }
 
   stages {
@@ -114,7 +114,7 @@ pipeline {
         echo "Here's where I'd put my registry"
       }
     }
-    
+
     stage('Deploy to dev') {
       when {
         branch 'master'
@@ -126,7 +126,7 @@ pipeline {
         }
       }
     }
-    
+
     stage('Smoke test dev') {
       when {
         branch 'master'
